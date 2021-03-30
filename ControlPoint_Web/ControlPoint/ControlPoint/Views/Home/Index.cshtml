@@ -1,0 +1,87 @@
+﻿@{
+    ViewData["Title"] = "Control point sample project";
+}
+
+<!-- Заголовок -->
+<div class="text-center">
+    <h1 class="display-4">Добро пожаловать!</h1>
+    <p>Это пример реализации ASP.net приложения. Подробней можно посмотреть на <a href="https://github.com/VolovikovAlexander/Hobby/tree/master/ControlPoint_Web">GitHub</a>.</p>
+</div>
+
+<br />
+
+<!-- Добавляем 3-панели с содержанием-->
+<div class="text-dark">
+    <div class="row">
+
+        <div class="col-sm-4 col-4">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion"
+                           href="#collapseTable1">
+                            Первая таблица
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTable1" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div id="dataTable1">
+                            <!--Вывести собственный шаблонный  компонент-->
+                            @await Component.InvokeAsync("Table1Component")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-4 col-4">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion"
+                           href="#collapseTable2">
+                            Вторая таблица
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTable2" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div id="dataTable2">
+                            <!--Вывести собственный шаблонный  компонент-->
+                            @await Component.InvokeAsync("Table2Component")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-sm-4 col-4">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <a data-toggle="collapse" data-parent="#accordion"
+                           href="#collapseTable3">
+                            Третья таблица
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTable3" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        <div id="dataTable3">
+                            <!--Вывести собственный шаблонный  компонент-->
+                            @await Component.InvokeAsync("Table3Component")
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

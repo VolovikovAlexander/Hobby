@@ -1,0 +1,303 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Electronic queue, Volovikov Alexander</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.3/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+
+    <script>
+        var host = 'https://localhost:44391/Home/';
+        var currentPointId = 0;
+        var currentServiceId = 0;
+        var app = angular.module('HomeApp', []);
+
+        app.controller('HomeController', function ($scope, $http) {
+
+            // Табличные данные с услугами в разрезе каждого пункта
+            $http.get(host + 'GetServices?pointID=1')
+                .then(function (response) {
+                    $scope.listServicesForP1 = response.data;
+                });
+
+            $http.get(host + 'GetServices?pointID=2')
+                .then(function (response) {
+                    $scope.listServicesForP2 = response.data;
+                });
+
+            $http.get(host + 'GetServices?pointID=3').
+                then(function (response) {
+                    $scope.listServicesForP3 = response.data;
+                });
+
+            // Получить журнал с желаниями пользователей на запись
+            $scope.funcGetJournalOfRegistartion = function () {
+                $http.get(host + 'GetJournalOfRegistration')
+                    .then(function (response) {
+                        $scope.journalRegistartion = response.data;
+                    });
+            }
+
+            $scope.funcGetJournalOfRegistartion();
+
+            // Получить обработанный журнал
+            $scope.funcGetJournalOfPassed = function () {
+                $http.get(host + 'GetJournalOfPassed')
+                    .then(function (response) {
+                        $scope.journalPassed = response.data;
+                    });
+            }
+
+            $scope.funcGetJournalOfPassed();
+
+            // Добавить новую услугу в очередь
+            $scope.funcAddQueue = function (pointId, serviceId, description) {
+                currentPointId = pointId;
+                currentServiceId = serviceId;
+
+                $("#txtServiceName").val(description);
+
+                var period = $("#txtServicePeriod").val();
+                if (period == undefined || period == "") {
+                    var now = new Date();
+                    period = moment(now).format('YYYY-MM-DDTHH:mm');
+                }
+
+                $("#txtServicePeriod").val(period);
+                $('#editQueueDialog').modal('show');
+            }
+
+            // Передача данных
+            $scope.funcSubmit = function () {
+                $('#editQueueDialog').modal('hide');
+                // TODO: Исходные данные не проверяю!
+                var data = { Period: $("#txtServicePeriod").val(), PointID: currentPointId, ServiceID: currentServiceId };
+
+                $http.post(host + "SendItemOfRegistration", data).then(
+                    function successCallback(response) {
+                        $scope.funcRefreshData();
+                    });
+            }
+
+            // Обновить данные
+            $scope.funcRefreshData = function () {
+                // Перезагружаем журнал регистрации
+                $scope.funcGetJournalOfRegistartion();
+                // Перезагружаю журнал фактов
+                $scope.funcGetJournalOfPassed();
+            }
+        });
+
+    </script>
+
+</head>
+<body ng-app="HomeApp" ng-controller="HomeController">
+
+    <!-- Основная часть -->
+    <div class="container" style="padding:25px;">
+
+        <div class="container">
+            <h1>Электронная очередь</h1><br />
+            <button type="button" class="btn btn-primary" ng-click="funcRefreshData()">Обновить данные</button>
+            <br /><br />
+
+            <div class="row">
+
+                <div class="col-md-4">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Окно № 1
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+
+                            <table class="table table-striped">
+                                <thead>
+                                    Список связанных услуг
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>Время, мин</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="x in listServicesForP1">
+                                        <td> <a href="#" ng-click="funcAddQueue(1, x.id, x.description)">{{x.description}}</a></td>
+                                        <td> {{x.timeLimit}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Окно № 2
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+
+                            <table class="table table-striped">
+                                <thead>
+                                    Список связанных услуг
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>Время, мин</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="x in listServicesForP2">
+                                        <td> <a href="#" ng-click="funcAddQueue(2, x.id, x.description)">{{x.description}}</a></td>
+                                        <td> {{x.timeLimit}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Окно № 3
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+
+                            <table class="table table-striped">
+                                <thead>
+                                    Список связанных услуг
+                                    <tr>
+                                        <th>Наименование</th>
+                                        <th>Время, мин</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="x in listServicesForP3">
+                                        <td> <a href="#" ng-click="funcAddQueue(3, x.id, x.description)">{{x.description}}</a></td>
+                                        <td> {{x.timeLimit}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-md-5">
+
+                    <table class="table table-striped">
+                        <thead>
+                            Регистрация
+                            <tr>
+                                <th>Период</th>
+                                <th>Услуга</th>
+                                <th>Пункт</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in journalRegistartion">
+                                <td> {{x.period}}</td>
+                                <td> {{x.service.description}}</td>
+                                <td> {{x.point.description}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+                <div class="col-md-7">
+
+                    <table class="table table-striped">
+                        <thead>
+                            Результат
+                            <tr>
+                                <th>Талон</th>
+                                <th>Услуга</th>
+                                <th>Пункт</th>
+                                <th>Начало</th>
+                                <th>Окончание</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="x in journalPassed">
+                                <td>{{x.ticket}}</td>
+                                <td> {{x.serviceName}}</td>
+                                <td> {{x.pointName}}</td>
+                                <td> {{x.startPeriod}}</td>
+                                <td> {{x.stopPeriod}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Форма ввода услуги -->
+
+    <div class="modal fade" id="editQueueDialog" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+
+            <div class="modal-dialog" style="width:600px">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">
+                            Добавить услугу
+                        </h4>
+                        <button type="button" class="close"
+                                data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Наимунование услуги:</label>
+                            <input id="txtServiceName" class="form-control" readonly="readonly" />
+                        </div>
+                        <div class="form-group">
+                            <label>Укажите дату и время когда Вы хотите получить услугу:</label>
+                            <input type="datetime" id="txtServicePeriod" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" ng-click="funcSubmit()">
+                            OK
+                        </button>
+                        <button type="button" class="btn btn-default"
+                                data-dismiss="modal">
+                            Отмена
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+</body>  

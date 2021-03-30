@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid", "Hybrid\Hybrid.csproj", "{DB82F059-F305-4FE0-9E14-6787FA4D5430}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleAppHybrid", "ConsoleAppHybrid\ConsoleAppHybrid.csproj", "{36739C88-0439-4B4E-AF3A-8B00D22DAFF4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB82F059-F305-4FE0-9E14-6787FA4D5430}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB82F059-F305-4FE0-9E14-6787FA4D5430}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB82F059-F305-4FE0-9E14-6787FA4D5430}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB82F059-F305-4FE0-9E14-6787FA4D5430}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36739C88-0439-4B4E-AF3A-8B00D22DAFF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36739C88-0439-4B4E-AF3A-8B00D22DAFF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36739C88-0439-4B4E-AF3A-8B00D22DAFF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36739C88-0439-4B4E-AF3A-8B00D22DAFF4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7736C888-2050-470E-A9C7-5A9F940A6E5C}
+	EndGlobalSection
+EndGlobal

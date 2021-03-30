@@ -1,0 +1,144 @@
+﻿@using ControlPoint.Models
+@model ViewTable2Model<Table2>
+
+<script>
+    var currentPage2 = 1;
+
+    // Сформировать полученную таблицу
+    function createTable2(response) {
+
+        var body = "";
+        body = "<table class='table table-hover table-condensed'><tr><th>Код</th><th>Данные</th><th>Период</th></tr>";
+        if (response == undefined) {
+            // Строим по модели
+            @foreach (var item in Model.Items)
+            {
+                <text>body += "<tr><td>@item.ID</td><td>@item.Data</td><td>@item.DateAdd</td></tr>";</text>
+            }
+        }
+        else {
+            var columns = Array("id", "data", "dateAdd");
+            // Строим по ответу из контролера
+            for (var rowIndex in response.items) {
+
+                var row = response.items[rowIndex];
+                body += "<tr>";
+
+                columns.forEach(function (item, i, arr) {
+                    body += "<td>" + row[item] + "</td>";
+                });
+                body += "</tr>";
+            }
+        }
+        body += "</table>";
+        $("#divTable2").html(body);
+    }
+
+    // Загрузить даннее таблицы
+    function LoadTable2(_url) {
+        // Передача данных
+        $.ajax({
+            type: "POST",
+            url: _url,
+            dataType: "json",
+            success: function (response) {
+                // Сформировать таблицу
+                createTable2(response);
+
+                // Видимость кнопок перехода
+                if (!response.page.hasPreviousPage)
+                    $("#btnPrev2").hide();
+                else
+                    $("#btnPrev2").show();
+
+                if (!response.page.hasNextPage)
+                    $("#btnNext2").hide();
+                else
+                    $("#btnNext2").show();
+            }
+        });
+    }
+
+    // Следующая страница
+    function NextLoad2() {
+        currentPage2 += 1;
+        var _url = '@Url.Action("GetTable2", "Home")?page=' + currentPage2;
+        LoadTable2(_url);
+    }
+
+    // Предыдущая страница
+    function PrevLoad2() {
+        currentPage2 -= 1;
+        var _url = '@Url.Action("GetTable2", "Home")?page=' + currentPage2;
+        LoadTable2(_url);
+    }
+
+    // Сформировать данные для таблицы
+    function BuildTable2() {
+        var _url = '@Url.Action("BuildTable2", "Home")';
+        LoadTable2(_url);
+    }
+
+    // Обновить таблицу
+    function RefreshTable2() {
+        var _url = '@Url.Action("GetTable2", "Home")?page=' + currentPage2;
+        LoadTable2(_url);
+    }
+
+</script>
+
+<div class="well well-lg">
+    <div class="row">
+        <div class="form-group">
+            <label>Произвольное значение:</label>
+            &nbsp;<input type="number" value="@Model.SomeValue" style="width:50px;" />
+         </div>
+        <div class="form-group">
+            <!-- Сформировать данные для таблицы -->
+            <a id="btnExecute2" class="btn btn-primary">Сформировать</a>
+            <!-- Перезагрузить таблицу -->
+            <a id="btnRefresh2" class="btn btn-default">Обновить</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="form-group">
+            <!-- Таблица -->
+            <div id="divTable2"></div>
+
+            <!-- Кнопки переключения -->
+            <a id="btnPrev2"
+                   class="btn btn-default">
+                    Назад
+            </a>
+            <a id="btnNext2"
+                   class="btn btn-default">
+                    Вперед
+                </a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $('#btnExecute2').on('click', function () {
+        BuildTable2();
+    });
+
+    $('#btnPrev2').on('click', function () {
+        PrevLoad2();
+    });
+
+    $('#btnNext2').on('click', function () {
+        NextLoad2();
+    });
+
+    $('#btnRefresh2').on('click', function () {
+        RefreshTable2();
+    });
+
+    $(document).ready(function () {
+        createTable2();
+    });
+
+
+</script>

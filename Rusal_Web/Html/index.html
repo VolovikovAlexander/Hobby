@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="SoftLineDemoTest" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="windows-1251" />
+
+    <link href="bootstrap.css" rel="stylesheet" />
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+
+    <script>
+        // Сформировать полученную таблицу
+        function buildTable(response) {
+            var body = "";
+
+            if (response != undefined) {
+                if (1 == 1) {
+                    body += "<thead><tr>";
+                    var columns = Array("firstName", "lastName", "phone", "birthdayString");
+                    var columnNames = Array("Имя", "Фамилия", "Телефон", "Дата рождения");
+
+                    // Заголовки
+                    body += "<th style='width:140px'>Операция</th>";
+                    for (var columnIndex in columnNames) {
+                        body += "<th>" + columnNames[columnIndex] + "</th>";
+                    }
+                    body += "</tr></thead><tbody>";
+
+
+                    // Данные
+                    for (var rowIndex in response) {
+                        var row = response[rowIndex];
+                        body += "<tr>";
+
+                        // Кнопка с удалением записи
+                        body += "<td><a class='btn btn-default' href='#' id='deleteRow' style='btn btn-default' onclick='deleteRow(" + row.mainID + ")'>Удалить</a></td>";
+
+                        columns.forEach(function (item, i, arr) {
+                            body += "<td>" + row[item] + "</td>";
+                        });
+                        body += "</tr>";
+                    }
+
+                    body += "</<tbody>"
+                }
+            }
+
+            result = "<table class='table table-striped table-hover'>";
+            result += body;
+            result += "</table>";
+
+            $("#divDataTable").show();
+            $("#divDataTable").html(result)
+        }
+
+        // Загрузить даннее таблицы
+        function loadTable() {
+            // Host
+            var _url = "https://localhost:44382/api/GetMainForm";
+
+            // Передача данных
+            $.ajax({
+                type: "GET",
+                url: _url,
+                dataType: "json",
+                success: function (response) {
+                    // Формируем таблицу
+                    buildTable(response);
+                }
+            });
+        }
+
+        // Удалить запись
+        function deleteRow(rowID) {
+            if (rowID != undefined) {
+                var _url = "https://localhost:44382/api/DeleteMainForm?MainID=" + rowID
+
+                // Передача данных
+                $.ajax({
+                    type: "GET",
+                    url: _url,
+                    dataType: "json",
+                    success: function (response) {
+                        // Перезагрузим таблицу
+                        loadTable();
+                    }
+                });
+
+                // Перезагрузим таблицу
+                loadTable();
+            }
+        }
+
+        // Отобразить ошибку на форме
+        function showError(message) {
+
+            $('#divErrorMessage').html(message);
+            $('#divErrorMessage').show();
+        }
+
+        // Загрузит ьв форму цвета
+        function loadColors() {
+            // Host
+            var _url = "https://localhost:44382/api/GetColors";
+
+            // Передача данных
+            $.ajax({
+                type: "GET",
+                url: _url,
+                dataType: "json",
+                success: function (response) {
+                    // Формируем чекбоксы
+                    buildColors(response);
+                }
+            });
+        }
+
+        // Построить список чекбоксов с цветами
+        function buildColors(response) {
+            var _html = "<div class='well well-lg' id='well-colors'>";
+
+            if (response != undefined) {
+                for (var itemIndex in response) {
+                    var item = response[itemIndex];
+                    _html += "<input type='checkbox' value='" + item["id"] + "' class='color-checkbox'>&nbsp;&nbsp;" + item["description"] + "</input><br>";
+                }
+            }
+
+            _html += "</div>";
+            $("#divColors").html(_html);
+        }
+
+        // Загрузка напитков
+        function loadDrinks() {
+            // Host
+            var _url = "https://localhost:44382/api/GetDrinks";
+
+            // Передача данных
+            $.ajax({
+                type: "GET",
+                url: _url,
+                dataType: "json",
+                success: function (response) {
+                    // Формируем чекбоксы
+                    buildDrinks(response);
+                }
+            });
+        }
+
+        // Формирование списка напитков
+        function buildDrinks(response) {
+            var _html = "<div class='well well-lg' id = 'well-drinks'>";
+
+            if (response != undefined) {
+                for (var itemIndex in response) {
+                    var item = response[itemIndex];
+                    _html += "<input type='checkbox' value='" + item["id"] + "' class='drink-checkbox'>&nbsp;&nbsp;" + item["description"] + "</input><br>";
+                }
+            }
+
+            _html += "</div>";
+            $("#divDrinks").html(_html);
+        }
+
+        // Добавить новую запись
+        function addMainForm() {
+            $('#divErrorMessage').hide();
+
+            // Проверки
+            if ($("#txtPhone").val().indexOf('+') == -1) {
+                showError("Поле /Телефон/ имеет не корректный формат!");
+                return;
+            }
+
+            if ($("#txtFirstName").val() == '') {
+                showError("Не указано имя!");
+                return;
+            }
+
+            if ($("#txtLastName").val() == '') {
+                showError("Не указано фамилия!");
+                return;
+            }
+
+            if ($("#txtBirthDay").val() == '') {
+                showError("Не указано дата рождения!");
+                return;
+            }
+
+
+            // Формируем json для отправки данных
+            var _json = {};
+            _json["FirstName"] = $("#txtFirstName").val();
+            _json["LastName"] = $("#txtLastName").val();
+            _json["Phone"] = $("#txtPhone").val();
+            _json["BirthDay"] = $("#txtBirthDay").val();
+
+            var _url = "https://localhost:44382/api/AddMainForm";
+
+            // Отправляем данные
+            $.ajax({
+                url: _url,
+                type: "POST",
+                dataType: "json",
+                data: _json,
+                success: function (result) {
+                    if (result != undefined) {
+                        var _id = result.id;
+                        if (_id <= 0) {
+                            showError("Ошибка при вставке данных!\n" + result.ErrorText);
+                        }
+
+                        // Передаем данные о выборе напитков и цветов
+                        var _selectJson = {};
+                        var SelectColors = []; 
+                        var SelectDrinks = [];
+
+                        // Цвета
+                        $('input.color-checkbox:checked').each(function (i, item) {
+                            var _item = {};
+                            _item["ColorID"] = $(item).attr("value");
+                            _item["Select"] = true;
+
+                            SelectColors.push(_item);
+                        });
+
+                        // Напитки
+                        $('input.drink-checkbox:checked').each(function (i, item) {
+                            var _item = {};
+                            _item["DrinkID"] = $(item).attr("value");
+                            _item["Select"] = true;
+
+                            SelectDrinks.push(_item);
+                        });
+
+                        _selectJson["SelectColors"] = SelectColors;
+                        _selectJson["SelectDrinks"] = SelectDrinks;
+                        _selectJson["MainID"] = _id;
+
+                        console.log(_selectJson);
+
+                        // Отправляем
+                        _url = "https://localhost:44382/api/AddSelect";
+
+                        $.ajax({
+                            url: _url,
+                            type: "POST",
+                            dataType: "json",
+                            data: _selectJson,
+                            success: function (result) { }
+                        });
+
+                        // Обновим таблицу
+                        loadTable();
+                    }
+                    
+                },
+                error: function (request, error) {
+                    console.log(arguments);
+                },
+                complete: function (data) {
+                    // Закроем форму|
+                    $("#editUser").modal('hide');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+            // Обновить данные
+            $("#btnRefresh").click(function () {
+                loadTable();
+            });
+
+            // Сохранить данные
+            $("#btnSaveData").click(function () {
+                addMainForm();
+            });
+
+            // При старте ..
+            loadTable();
+            loadColors();
+            loadDrinks();
+        });
+
+    </script>
+
+</head>
+<body>
+            <!-- Заголовок-->
+            <h1>
+                        &nbsp;Администрирование &rsaquo; Заявки
+            </h1>
+
+            <!-- Панель управления -->
+            <div id="divCommandPanel">
+                        <ul class="breadcrumb">
+                            <li><button id="btnRefresh" type="button" class="btn btn-primary" href="#">Обновить</button></li>
+                            <li><button id="btnAddMainForm" type="button" class="btn btn-default add-new-button" data-toggle="modal" data-target="#editUser"><i class="glyphicon glyphicon-plus"></i> Добавить анкету</button></li>
+                        </ul>
+            </div>
+
+
+            <!-- Таблица с данными -->
+            <div id="divDataTable">
+            </div>
+
+            <!-- Форма ввода данных -->
+            <div class="modal fade" id="editUser" tabindex="-1" role="dialog" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    <h4 class="modal-title" id="myModalLabel">Добавить анкету</h4>
+                                </div>
+                                <div class="modal-body">
+
+                                    <!-- Сообщение об ошибке -->
+                                 <div class="alert alert-danger" id="divErrorMessage" style="display: none">
+                                 </div>
+
+
+                                    <!-- Вкладки -->
+                                <ul class="nav nav-tabs">
+                                        <li class="active"><a href="#basic-tab" data-toggle="tab">Основное</a></li>
+                                        <li><a href="#colors-tab" data-toggle="tab">Цвета</a></li>
+                                        <li><a href="#drinks-tab" data-toggle="tab">Напитки</a></li>
+                                </ul>
+
+
+                                <div class="tab-content">
+
+                                <!-- Основная вклдадка-->
+                                <div class="tab-pane active" id="basic-tab">
+
+                                            <div class="form-group">
+                                                <label>Имя:</label>
+                                                <input type="text" class="form-control" id="txtFirstName" value="" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Фамилия:</label>
+                                                <input type="text" class="form-control" id="txtLastName" value="" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Телефон:</label>
+                                                <input type="text" class="form-control" id="txtPhone" value="" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Дата рождения:</label>
+                                                <input type="date" class="form-control" id="txtBirthDay" value="" />
+                                            </div>
+
+                                        </div>
+
+                                <!-- Выбор цвета -->
+                                <div id="colors-tab" class="tab-pane">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a data-toggle="collapse" data-parent="#accordion"
+                                                   href="#collapseColors">
+                                                    Укажите Ваши любимые цвета
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapseColors" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div id="divColors"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Выбор напитков -->
+                                <div id="drinks-tab" class="tab-pane">
+                                    <div class="panel panel-info">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a data-toggle="collapse" data-parent="#accordion"
+                                                   href="#collapseDrinks">
+                                                    Укажите Ваши напитки
+                                                </a>
+                                            </h4>
+                                        </div>
+                                        <div id="collapseDrinks" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div id="divDrinks"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                </div>
+
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button id="btnSaveData" type="button" class="btn btn-primary">Сохранить</button>
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+                                </div>
+                            </div><!-- /.modal-content -->
+                </div><!-- /.modal-dialog -->
+            </div><!-- /.modal -->
+
+    </body>
+</html>

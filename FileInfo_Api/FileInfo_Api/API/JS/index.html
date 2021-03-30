@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta name="SoftLineDemoTest" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta charset="windows-1251" />
+
+    <link href="bootstrap.css" rel="stylesheet" />
+
+    <script src="jquery.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+</head>
+<body>
+
+    
+        <!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Загрузка файлов</h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="well well-lg">
+                        <input type="file" name="formFile" id="formFile" accept=".txt">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Укажите тип разделителя:</label>
+                        <div class="well well-sm">
+                            <label class="checkbox-inline">
+                                <input type="radio" name="delimiter" id="delimiterComma" value="1">&nbsp;Запятая
+                            </label>
+                            <label class="checkbox-inline">
+                                <input type="radio" name="delimiter" id="delimiterTab" value="3" checked="checked">&nbsp;Табуляция
+                            </label>
+                        </div>
+                        <br />
+                        <button type="button" id="btnDownload" class="btn btn-primary">Загрузить файл</button>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="alert-danger well-lg" style="display: none;" id="errorPannel">
+                            <label id="errorText"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div id="resultTable" style="display: none;">
+                            <table class="table table-striped">
+                                <caption>Результат загрузки данных</caption>
+                                <thead><tr><th></th></tr></thead>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div><!-- /.modal-content -->
+        </div>
+        <!-- ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+
+    
+
+    <script>
+            $(document).ready(function () {
+
+                // Показать сообщение об ошибке
+                function showError(errorText) {
+                    if (errorText == undefined || errorText == "") {
+                        $("#errorText").text("");
+                        $("#errorPannel").hide();
+                    }
+                    else {
+                        $("#errorPannel").show();
+                        $("#errorText").text(errorText);
+                    }
+                }
+
+                // Показать результат с таблицей
+                function showTable(e) {
+                    console.log(e);
+                }
+
+                // Сформировать полученную таблицу
+                function buildTable(response) {
+                    
+                    var body = "";
+
+                    if (response != undefined) {
+                        var json = $.parseJSON(response);
+
+                        if (json.errorText != "") {
+                            showError(json.errorText);
+                        }
+                        else {
+
+                            body += "<tr>";
+                            // Заголовки
+                            for (var columnIndex in json.columns) {
+                                body += "<th>" + json.columns[columnIndex] + "</th>";
+                            }
+                            body += "</tr>";
+
+
+                            // Данные
+                            for (var rowIndex in json.rows) {
+                                var row = json.rows[rowIndex];
+                                body += "<tr>";
+                                for (var columnIndex in json.columns[columnIndex]) {
+                                    body += "<td>" + row.values[columnIndex] + "</td>";
+                                }
+                                body += "</tr>";
+                            }
+                        }
+                    }
+
+                    result = "<table class='table table-striped'>";
+                    result += body;
+                    result += "</table>";
+
+                    $("#resultTable").show();
+                    $("#resultTable").html(result)
+                }
+
+                // Выбрать файл
+                $("#formFile").change(function () {
+                    if ($("#formFile").val().split(".").pop().toLowerCase() == "txt") {
+                        showError();
+                    } else {
+                        showError("Не верно выбран файл. Файл должен быть только с расширением (*.TXT).");
+                        $("#formFile").val("");
+                        $("#softlineFile").val("");
+                        $('#resultTable').hide();
+                    }
+                });
+
+                // Отправить на сервер
+                $("#btnDownload").click(function () {
+                    showError();
+
+                    var fileInput = $('#formFile')[0];
+                    var file = fileInput.files[0];
+
+                    if (file == undefined) {
+                        showError("Не указан файл для загрузки!");
+                        return;
+                    }
+
+                    var formData = new FormData();
+                    var file = fileInput.files[0];
+                    formData.append("formFile", file);
+
+                    var options = $("input[name='delimiter']:checked").val();
+                    var _url = "http://localhost:64474/FileInfo/api/loadFile?charDelimiter=" + options;
+                    
+                    // Передача данных
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", _url, false);
+                    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+                    xhr.send(formData);
+                    var response = xhr.responseText;
+                    buildTable(response);
+                });
+             });
+
+        </script>
+
+
+</body>
+</html>

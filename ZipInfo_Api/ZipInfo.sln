@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.87
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipInfoServer", "ZipInfo\ZipInfoServer.csproj", "{4699C5D7-B962-406F-854A-8A1518E2123F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZipCodeTesting", "ZipCodeTesting\ZipCodeTesting.csproj", "{A9347A7C-DDDD-438B-AC47-F408FBE7C007}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4699C5D7-B962-406F-854A-8A1518E2123F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4699C5D7-B962-406F-854A-8A1518E2123F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4699C5D7-B962-406F-854A-8A1518E2123F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4699C5D7-B962-406F-854A-8A1518E2123F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9347A7C-DDDD-438B-AC47-F408FBE7C007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9347A7C-DDDD-438B-AC47-F408FBE7C007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9347A7C-DDDD-438B-AC47-F408FBE7C007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9347A7C-DDDD-438B-AC47-F408FBE7C007}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {44907AB3-0EE9-477A-ABF2-E369F1B50FA4}
+	EndGlobalSection
+EndGlobal
