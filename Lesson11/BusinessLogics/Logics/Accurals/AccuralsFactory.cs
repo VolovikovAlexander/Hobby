@@ -19,11 +19,8 @@ namespace Lesson11.BL
         /// <param name="context"> Контекст с данными <see cref="ICompany"/></param>
         public AccuralsFactory(ICompany context)
         {
-            if (context is null)
-                throw new ArgumentNullException("Некоректно переданы параметры!", nameof(context));
-
-
-            Startup(context);
+            _context = context ?? throw new ArgumentNullException("Некоректно переданы параметры!", nameof(context));
+            Startup();
         }
 
         #region IAccuralsFactory
@@ -34,18 +31,18 @@ namespace Lesson11.BL
         /// <param name="emploee"></param>
         /// <param name="period"></param>
         /// <returns></returns>
-        public IEnumerable<IProccessAccurals> Process(DateTime period)
+        public IEnumerable<IAccruals> Process(DateTime period)
         {
             var emploees = _context
-                                .Departments
-                                .SelectMany(x => x.Emploees);
+                           .Departments
+                           .SelectMany(x => x.Emploees);
 
-            var result = new List<IProccessAccurals>();
-            foreach(var item in emploees)
-            {
-                var costs = Process(item, period);
-                result.AddRange(costs.ToArray());
-            }
+            var result = new List<IAccruals>();
+            emploees.ToList()
+                .ForEach(x =>
+                {
+                    result.AddRange(Process(x, period).ToArray());
+                });
 
             return result;
         }
@@ -54,10 +51,8 @@ namespace Lesson11.BL
         /// Подключить обработчики для начисления заработной платы
         /// </summary>
         /// <param name="context"></param>
-        public void Startup(ICompany context)
+        public void Startup()
         {
-            _context = context;
-
             // Подключаем сервисы
             IServiceCollection services = new ServiceCollection();
             services.AddTransient<IProccessAccurals, ClerkProccessAccurals>();
@@ -66,10 +61,6 @@ namespace Lesson11.BL
 
             // Формируем провайдер
             _provider = services.BuildServiceProvider();
-
-            // Подключаем сервисы к контексту
-            foreach (var item in _provider.GetServices<IProccessAccurals>())
-                item.Context = _context;
         }
 
         #endregion
@@ -80,9 +71,13 @@ namespace Lesson11.BL
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        private IEnumerable<IProccessAccurals> Process(IEmploee emploee, DateTime period)
+        private IEnumerable<IAccruals> Process(IEmploee emploee, DateTime period)
         {
-            return null; 
+            var services = _provider.GetServices<IProccessAccurals>();
+            if (!services.Any(x => x.Type == emploee.Type))
+                throw new InvalidOperationException($"Невозможно произветсти расчет по сотруднику {emploee.ToString()}. Тип сотрудника: {emploee.Type} не включен в схему расчета!");
+
+            return services.First(x => x.Type == emploee.Type).Proccess(_context, emploee, period);
         }
     }
 }

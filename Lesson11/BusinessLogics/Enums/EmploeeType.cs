@@ -5,6 +5,8 @@
     /// </summary>
     public enum EmploeeType
     {
+        None = 0,
+
         /// <summary>
         /// Управленец
         /// </summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lesson11.BL.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Lesson11.BL
@@ -8,11 +9,6 @@ namespace Lesson11.BL
     /// </summary>
     public interface IProccessAccurals
     {
-        /// <summary>
-        /// Контекст для работы с данными
-        /// </summary>
-        public ICompany Context { set; }
-
         /// <summary>
         /// Минимальная ставка
         /// </summary>
@@ -24,6 +20,11 @@ namespace Lesson11.BL
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        public IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period);
+        public IEnumerable<IAccruals> Proccess(ICompany context, IEmploee emploee, DateTime period);
+
+        /// <summary>
+        /// Тип сотрудника
+        /// </summary>
+        public EmploeeType Type { get; }
     }
 }

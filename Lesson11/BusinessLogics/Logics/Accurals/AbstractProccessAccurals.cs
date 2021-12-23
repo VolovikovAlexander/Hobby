@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lesson11.BL.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace Lesson11.BL
@@ -12,22 +13,17 @@ namespace Lesson11.BL
         protected DateTime _period;
         protected ICompany _context;
 
-
         #region constructors
-        public AbstractProccessAccurals() { }
 
-        public AbstractProccessAccurals(ICompany context)
-        {
-            _context = context ?? throw new ArgumentException("Некорректно переданы параметры!", nameof(Context));
-        }
+        public AbstractProccessAccurals() { }
 
         #endregion
 
-        /// <summary>
-        /// Контекст для работы с данными
-        /// </summary>
-        public ICompany Context { set => _context = value ?? throw new ArgumentException("Некорректно переданы параметры!", nameof(Context)); }
-        public double MinimalCost { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        #region IProccessAccurals
+
+        public double MinimalCost { get; set; }
+
+        public virtual EmploeeType Type => EmploeeType.None;
 
         /// <summary>
         /// Провести начисление. 
@@ -35,18 +31,34 @@ namespace Lesson11.BL
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период начисления </param>
         /// <returns>Возвращает структуру <see cref="IAccruals"/> с заполненными базовыми реквизитами</returns>
-        public virtual IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period)
+        public virtual IEnumerable<IAccruals> Proccess(ICompany context, IEmploee emploee, DateTime period)
         {
+            _context = context;
+
             if (emploee is null)
                 throw new ArgumentNullException("Некорректно переданы параметры!", nameof(emploee));
 
             if (_context is null)
-                throw new ArgumentException("Для расчета заработной платы необходимо передать контекст!", nameof(Context));
+                throw new ArgumentException("Для расчета заработной платы необходимо передать контекст!", nameof(_context));
 
             _emploee = emploee;
             _period = period;
 
             return new[] { new Accurals() { Emploee = emploee, EmploeeType = emploee.Type, Period = period } };
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Рассчитать начало и окончания месяца
+        /// </summary>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        protected Tuple<DateTime, DateTime> GetPeriod(DateTime period)
+        {
+            var startPeriod = new DateTime(period.Year, period.Month, 1);
+            var stopPeriod = startPeriod.AddMonths(1).AddDays(-1);
+            return new Tuple<DateTime, DateTime>(startPeriod, stopPeriod);
         }
     }
 }

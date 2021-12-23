@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lesson11.BL.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,22 +10,30 @@ namespace Lesson11.BL
     /// </summary>
     public class InternProccessAccurals: AbstractProccessAccurals
     {
+        public InternProccessAccurals() { MinimalCost = 500; }
+
+
         /// <summary>
         /// Расчет заработной платы
         /// </summary>
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        public override IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period)
+        public override IEnumerable<IAccruals> Proccess(ICompany context, IEmploee emploee, DateTime period)
         {
             if (emploee is null)
                 throw new ArgumentNullException("Некорректно переданы параметры!", nameof(emploee));
 
-            var result = base.Proccess(emploee, period).First();
+            var result = base.Proccess(context, emploee, period).First();
             result.Type = Enums.AccrualsType.Month;
-            result.Cost = 500;
+            result.Cost = MinimalCost;
 
             return new[] { result };
         }
+
+        /// <summary>
+        /// Тип сотрудника
+        /// </summary>
+        public override EmploeeType Type => EmploeeType.Intern;
     }
 }

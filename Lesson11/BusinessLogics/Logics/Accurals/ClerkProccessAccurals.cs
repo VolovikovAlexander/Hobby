@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lesson11.BL.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,22 +10,27 @@ namespace Lesson11.BL
     /// </summary>
     public class ClerkProccessAccurals: AbstractProccessAccurals
     {
+        public ClerkProccessAccurals() { MinimalCost = 12; }
+
+
         /// <summary>
         /// Процесс расчета заработной платы
         /// </summary>
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        public override IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period)
+        public override IEnumerable<IAccruals> Proccess(ICompany context, IEmploee emploee, DateTime period)
         {
+            _context = context;
+
             if (_context is null)
                 throw new InvalidOperationException("Для расчета заработной платы необходимо передать контекст!");
 
             if (emploee is null)
                 throw new ArgumentNullException("Некорректно переданы параметры!", nameof(emploee));
 
-            var startPeriod = new DateTime(period.Year, period.Month, 1);
-            var stopPeriod = new DateTime(period.Year, period.Month + 1, 1).AddDays(-1);
+            var startPeriod = this.GetPeriod(period).Item1;
+            var stopPeriod = this.GetPeriod(period).Item2;
             var result = new List<IAccruals>();
 
             // Проверка. Есть ли вообще такой сотрудник?
@@ -49,9 +55,9 @@ namespace Lesson11.BL
                 var dayOfWeek = currentPeriod.DayOfWeek;
                 if (!(dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday))
                 {
-                    var template = base.Proccess(emploee, period).First();
+                    var template = base.Proccess(context, emploee, period).First();
                     template.Type = Enums.AccrualsType.Day;
-                    template.Cost = 12;
+                    template.Cost = MinimalCost;
                     template.Period = currentPeriod;
 
                     result.Add(template);
@@ -62,5 +68,10 @@ namespace Lesson11.BL
 
             return result;
         }
+
+        /// <summary>
+        /// Тип сотрудника
+        /// </summary>
+        public override EmploeeType Type => EmploeeType.Clerk;
     }
 }

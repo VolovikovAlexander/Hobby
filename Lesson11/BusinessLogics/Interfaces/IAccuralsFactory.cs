@@ -13,12 +13,11 @@ namespace Lesson11.BL
         /// </summary>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        public IEnumerable<IProccessAccurals> Process(DateTime period);
+        public IEnumerable<IAccruals> Process(DateTime period);
 
         /// <summary>
         /// Сконфигурировать фабрику
         /// </summary>
-        /// <param name="Context"> Контекст с данными </param>
-        public void Startup(ICompany Context);
+        public void Startup();
     }
 }

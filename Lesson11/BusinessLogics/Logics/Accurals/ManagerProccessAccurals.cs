@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Lesson11.BL.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,25 +10,26 @@ namespace Lesson11.BL
     /// </summary>
     public class ManagerProccessAccurals: AbstractProccessAccurals
     {
+        public ManagerProccessAccurals() { MinimalCost = 1300; }
+
         /// <summary>
         /// Процесс расчета заработной платы.
         /// </summary>
         /// <param name="emploee"></param>
         /// <param name="period"></param>
         /// <returns></returns>
-        public override IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period)
+        public override IEnumerable<IAccruals> Proccess(ICompany context, IEmploee emploee, DateTime period)
         {
+            var startPeriod = this.GetPeriod(period).Item1;
+            var stopPeriod = this.GetPeriod(period).Item2;
+            var result = base.Proccess(context, emploee, period).First();
+
             if (_context is null)
                 throw new InvalidOperationException("Для расчета заработной платы необходимо передать контекст!");
 
             if (emploee is null)
                 throw new ArgumentNullException("Некорректно переданы параметры!", nameof(emploee));
 
-            var startPeriod = new DateTime(period.Year, period.Month, 1);
-            var stopPeriod = new DateTime(period.Year, period.Month + 1, 1).AddDays(-1);
-
-
-            var result = base.Proccess(emploee, period).First();
             result.Type = Enums.AccrualsType.Month;
 
             // 1 Период устанавливаем всегда : конец месяца
@@ -56,5 +58,10 @@ namespace Lesson11.BL
 
             return new[] { result };
         }
+
+        /// <summary>
+        /// Тип сотрудника
+        /// </summary>
+        public override EmploeeType Type => EmploeeType.Manager;
     }
 }
