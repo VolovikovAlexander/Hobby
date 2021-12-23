@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lesson11.BL
 {
@@ -23,6 +24,6 @@ namespace Lesson11.BL
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        public IAccruals Proccess(IEmploee emploee, DateTime period);
+        public IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period);
     }
 }

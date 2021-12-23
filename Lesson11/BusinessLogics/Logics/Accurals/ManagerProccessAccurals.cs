@@ -1,14 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Lesson11.BL
 {
     /// <summary>
-    /// Поцесс начисления заработной платы для менеджера
+    /// Поцесс начисления заработной платы для менеджера. 15% от суммы начисления всех сотрудников для всех отделов где менеджер является руководителем.
     /// </summary>
     public class ManagerProccessAccurals: AbstractProccessAccurals
     {
-        public override IAccruals Proccess(IEmploee emploee, DateTime period)
+        /// <summary>
+        /// Процесс расчета заработной платы.
+        /// </summary>
+        /// <param name="emploee"></param>
+        /// <param name="period"></param>
+        /// <returns></returns>
+        public override IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period)
         {
             if (_context is null)
                 throw new InvalidOperationException("Для расчета заработной платы необходимо передать контекст!");
@@ -20,7 +27,7 @@ namespace Lesson11.BL
             var stopPeriod = new DateTime(period.Year, period.Month + 1, 1).AddDays(-1);
 
 
-            var result = base.Proccess(emploee, period);
+            var result = base.Proccess(emploee, period).First();
             result.Type = Enums.AccrualsType.Month;
 
             // 1 Период устанавливаем всегда : конец месяца
@@ -36,15 +43,18 @@ namespace Lesson11.BL
                                 .SelectMany(x => x.Tariffs);
 
             if (!allTariffs.Where(x => x.Key >= startPeriod && x.Key <= stopPeriod).Any())
+                // Если нет сотрудников или нет начислений, то минимальную сумму платим.
                 result.Cost = MinimalCost;
             else
             {
+                // Рассчитываем вознаграждение
                 var allCosts = allTariffs.Where(x => x.Key >= startPeriod && x.Key <= stopPeriod)
                             .Select(x => x.Value);
-                result.Cost = allCosts.Sum(x => x.Cost);
+                result.Cost = (allCosts.Sum(x => x.Cost) * 100) / 15;
+                result.Cost = result.Cost < MinimalCost ? MinimalCost : result.Cost;
             }
 
-            return result;
+            return new[] { result };
         }
     }
 }

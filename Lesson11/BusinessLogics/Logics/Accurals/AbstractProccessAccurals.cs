@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Lesson11.BL
 {
@@ -34,7 +35,7 @@ namespace Lesson11.BL
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период начисления </param>
         /// <returns>Возвращает структуру <see cref="IAccruals"/> с заполненными базовыми реквизитами</returns>
-        public virtual IAccruals Proccess(IEmploee emploee, DateTime period)
+        public virtual IEnumerable<IAccruals> Proccess(IEmploee emploee, DateTime period)
         {
             if (emploee is null)
                 throw new ArgumentNullException("Некорректно переданы параметры!", nameof(emploee));
@@ -45,7 +46,7 @@ namespace Lesson11.BL
             _emploee = emploee;
             _period = period;
 
-            return new Accurals() { Emploee = emploee, EmploeeType = emploee.Type, Period = period };
+            return new[] { new Accurals() { Emploee = emploee, EmploeeType = emploee.Type, Period = period } };
         }
     }
 }
