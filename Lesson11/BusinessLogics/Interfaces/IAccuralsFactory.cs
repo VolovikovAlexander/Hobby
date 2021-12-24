@@ -9,15 +9,18 @@ namespace Lesson11.BL
     public interface IAccuralsFactory
     {
         /// <summary>
-        /// Провести расчет заработной платы
+        /// Провести полный расчет заработной платы
         /// </summary>
         /// <param name="period"> Период </param>
         /// <returns></returns>
         public IEnumerable<IAccruals> Process(DateTime period);
 
         /// <summary>
-        /// Сконфигурировать фабрику
+        /// Провести расчета заработной платы по конкретному сотруднику
         /// </summary>
-        public void Startup();
+        /// <param name="emploee"> Сотрудник </param>
+        /// <param name="period"> Период </param>
+        /// <returns></returns>
+        public IEnumerable<IAccruals> Process(IEmploee emploee, DateTime period);
     }
 }

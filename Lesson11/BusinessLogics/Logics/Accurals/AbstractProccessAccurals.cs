@@ -48,17 +48,5 @@ namespace Lesson11.BL
         }
 
         #endregion
-
-        /// <summary>
-        /// Рассчитать начало и окончания месяца
-        /// </summary>
-        /// <param name="period"></param>
-        /// <returns></returns>
-        protected Tuple<DateTime, DateTime> GetPeriod(DateTime period)
-        {
-            var startPeriod = new DateTime(period.Year, period.Month, 1);
-            var stopPeriod = startPeriod.AddMonths(1).AddDays(-1);
-            return new Tuple<DateTime, DateTime>(startPeriod, stopPeriod);
-        }
     }
 }

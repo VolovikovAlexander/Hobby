@@ -26,7 +26,7 @@ namespace Lesson11.BL
                     emploees.Add(emploee);
                 });
 
-            // Создаем 5 отделов по 100 сотрудников
+            // Создаем 5 отделов до 100 сотрудников
             var departments = new List<IDepartment>();
             emploees.Where(x => x.Type == Enums.EmploeeType.Manager)
                         .Take(5)
@@ -40,6 +40,8 @@ namespace Lesson11.BL
                                 Id = _rnd.Next(1, 9999),
                                 Emploees = Enumerable.Range(1, 100)
                                               .Select(x => new Emploee().CreateContextEmploee())
+                                              // Только рядовые сотрудники и интерны
+                                              .Where(x => x.Type != Enums.EmploeeType.Manager)
                             };
                             departments.Add(department);
                         });
@@ -106,6 +108,16 @@ namespace Lesson11.BL
             collection
                  .AddSingleton<ICompany, Company>()
                  .AddSingleton<IAccuralsFactory, AccuralsFactory>();
+
+
+        /// <summary>
+        /// Получить структуру с информацией о заработной плате.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static AccuralsTariff ToAccuralsTariff(this Accurals source)
+            => new AccuralsTariff()
+                { Cost = source.Cost, Description = $"Начисление для {source.Emploee.ToString()} за {source.Period}" };
 
     }
 }

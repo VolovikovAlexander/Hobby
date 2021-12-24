@@ -10,7 +10,7 @@ namespace Lesson11.BL
     /// </summary>
     public class ClerkProccessAccurals: AbstractProccessAccurals
     {
-        public ClerkProccessAccurals() { MinimalCost = 12; }
+        public ClerkProccessAccurals() { MinimalCost = AccuralsHelper.Clerk; }
 
 
         /// <summary>
@@ -29,42 +29,28 @@ namespace Lesson11.BL
             if (emploee is null)
                 throw new ArgumentNullException("Некорректно переданы параметры!", nameof(emploee));
 
-            var startPeriod = this.GetPeriod(period).Item1;
-            var stopPeriod = this.GetPeriod(period).Item2;
+            var periods = AccuralsHelper.GetPeriod(period);
+            var startPeriod = periods.Item1;
+            var stopPeriod = periods.Item2;
             var result = new List<IAccruals>();
 
-            // Проверка. Есть ли вообще такой сотрудник?
-            var tryEmploee = _context.Departments
-                                .SelectMany(x => x.Emploees)
-                                .Where(x => x.Id == emploee.Id)
-                                .FirstOrDefault();
-
-            if (tryEmploee is null)
-                throw new InvalidOperationException($"Сотрудник {emploee.ToString()} не работает в текущей организации!");
-
             // Проверка. Есть ли начисления за указанный период?
-            var oldCosts = tryEmploee.Tariffs.Keys.Where(x => x >= startPeriod && x <= stopPeriod);
+            var oldCosts = emploee.Tariffs.Keys.Where(x => x >= startPeriod && x <= stopPeriod);
             if (oldCosts.Any())
                 foreach (var item in oldCosts)
-                    tryEmploee.Tariffs.Remove(item);
+                    emploee.Tariffs.Remove(item);
 
             // Начисление за каждый рабочий день по 12$
-            var currentPeriod = startPeriod;
-            while(currentPeriod < stopPeriod)
+            var list = AccuralsHelper.GetWorkPeriod(startPeriod, stopPeriod);
+            list.ToList().ForEach(x =>
             {
-                var dayOfWeek = currentPeriod.DayOfWeek;
-                if (!(dayOfWeek == DayOfWeek.Saturday || dayOfWeek == DayOfWeek.Sunday))
-                {
-                    var template = base.Proccess(context, emploee, period).First();
-                    template.Type = Enums.AccrualsType.Day;
-                    template.Cost = MinimalCost;
-                    template.Period = currentPeriod;
+               var template = base.Proccess(context, emploee, period).First();
+               template.Type = Enums.AccrualsType.Day;
+               template.Cost = MinimalCost;
+               template.Period = x;
+               result.Add(template);
 
-                    result.Add(template);
-                }
-
-                currentPeriod = currentPeriod.AddDays(1);
-            }
+            });
 
             return result;
         }

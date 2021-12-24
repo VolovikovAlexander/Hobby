@@ -10,7 +10,7 @@ namespace Lesson11.BL
     /// </summary>
     public class InternProccessAccurals: AbstractProccessAccurals
     {
-        public InternProccessAccurals() { MinimalCost = 500; }
+        public InternProccessAccurals() { MinimalCost = AccuralsHelper.Intern; }
 
 
         /// <summary>

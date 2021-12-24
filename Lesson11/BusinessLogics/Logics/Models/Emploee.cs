@@ -28,5 +28,10 @@ namespace Lesson11.BL
         public IDictionary<DateTime, IAccuralsTariff> Tariffs { get => _tariffs; set => _tariffs = value; }
 
         #endregion
+
+        public override string ToString()
+        {
+            return ($"{FirstName} {LastName}, тел: {PhoneNumber}").Trim();
+        }
     }
 }

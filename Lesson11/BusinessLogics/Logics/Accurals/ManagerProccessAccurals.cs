@@ -10,7 +10,7 @@ namespace Lesson11.BL
     /// </summary>
     public class ManagerProccessAccurals: AbstractProccessAccurals
     {
-        public ManagerProccessAccurals() { MinimalCost = 1300; }
+        public ManagerProccessAccurals() { MinimalCost = AccuralsHelper.Manager; }
 
         /// <summary>
         /// Процесс расчета заработной платы.
@@ -20,8 +20,9 @@ namespace Lesson11.BL
         /// <returns></returns>
         public override IEnumerable<IAccruals> Proccess(ICompany context, IEmploee emploee, DateTime period)
         {
-            var startPeriod = this.GetPeriod(period).Item1;
-            var stopPeriod = this.GetPeriod(period).Item2;
+            var periods = AccuralsHelper.GetPeriod(period);
+            var startPeriod = periods.Item1;
+            var stopPeriod = periods.Item2;
             var result = base.Proccess(context, emploee, period).First();
 
             if (_context is null)

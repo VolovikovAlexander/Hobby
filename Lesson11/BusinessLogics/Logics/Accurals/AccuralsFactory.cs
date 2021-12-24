@@ -33,16 +33,32 @@ namespace Lesson11.BL
         /// <returns></returns>
         public IEnumerable<IAccruals> Process(DateTime period)
         {
-            var emploees = _context
-                           .Departments
-                           .SelectMany(x => x.Emploees);
-
             var result = new List<IAccruals>();
-            emploees.ToList()
-                .ForEach(x =>
-                {
-                    result.AddRange(Process(x, period).ToArray());
-                });
+
+            foreach(var department in _context.Departments)
+            {
+                var emploees = department.Emploees.ToList();
+
+                // Начисления для сотрудников
+                emploees.ForEach(x =>
+                   {
+                       var accurals = Process(x, period).ToList();
+                       accurals.ForEach(y =>
+                       {
+                           x.Tariffs.Add(y.Period, (y as Accurals).ToAccuralsTariff());
+                       });
+
+                       result.AddRange(accurals);
+                   });
+
+                department.Emploees = emploees;
+
+                // Начисления для руководства
+                var accurals = Process(department.Boss, period).First();
+                department.Boss.Tariffs.Add(period, (accurals as Accurals).ToAccuralsTariff());
+
+                result.Add(accurals);
+            }
 
             return result;
         }
@@ -51,7 +67,7 @@ namespace Lesson11.BL
         /// Подключить обработчики для начисления заработной платы
         /// </summary>
         /// <param name="context"></param>
-        public void Startup()
+        private void Startup()
         {
             // Подключаем сервисы
             IServiceCollection services = new ServiceCollection();
@@ -71,13 +87,14 @@ namespace Lesson11.BL
         /// <param name="emploee"> Сотрудник </param>
         /// <param name="period"> Период </param>
         /// <returns></returns>
-        private IEnumerable<IAccruals> Process(IEmploee emploee, DateTime period)
+        public IEnumerable<IAccruals> Process(IEmploee emploee, DateTime period)
         {
             var services = _provider.GetServices<IProccessAccurals>();
             if (!services.Any(x => x.Type == emploee.Type))
                 throw new InvalidOperationException($"Невозможно произветсти расчет по сотруднику {emploee.ToString()}. Тип сотрудника: {emploee.Type} не включен в схему расчета!");
 
-            return services.First(x => x.Type == emploee.Type).Proccess(_context, emploee, period);
+            var service = services.First(x => x.Type == emploee.Type);
+            return service.Proccess(_context, emploee, period);
         }
     }
 }
