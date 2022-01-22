@@ -36,8 +36,9 @@ namespace Forbidden_Tests
         {
             // Подготовка
             var hosts = this.GetHosts()
-                            .Select(x => x.ToHost());
-            var host = sourceHost.ToHost();
+                            .Select(x => x.ToHost())
+                            .ToList();
+            var host = hosts.Where(x => x.Host == sourceHost).First();
 
             // Действия
             var result = host.GetParent(hosts);
