@@ -7,7 +7,6 @@ namespace Forbidden_Tests
 
     public class BaseTests
     {
-      
         /// <summary>
         /// Проверить формирование структуры <see cref="HostItem"/>
         /// </summary>
@@ -18,7 +17,7 @@ namespace Forbidden_Tests
             var hosts = this.GetHosts();
 
             // Действия
-            var result = hosts.ToHosts();
+            var result = hosts.ToHosts().ToList();
 
             // Проверки
             Assert.AreEqual(hosts.Count(), result.Count());
@@ -30,6 +29,7 @@ namespace Forbidden_Tests
         /// Проверить поиск владельца хоста
         /// </summary>
         [Test]
+        [TestCase("unlock.unlock.microvirus.md", "microvirus.md")]
         [TestCase("unlock.microvirus.md", "microvirus.md")]
         [TestCase("credit.card.us", "card.us")]
         public void Check_Extensions_GetParent(string sourceHost, string parentHost)
@@ -38,7 +38,9 @@ namespace Forbidden_Tests
             var hosts = this.GetHosts()
                             .Select(x => x.ToHost())
                             .ToList();
-            var host = hosts.Where(x => x.Host == sourceHost).First();
+            var host = hosts.Where(x => x.Host == sourceHost).FirstOrDefault();
+            if (host is null)
+                Assert.Pass("Некорректные условия для запуска автотеста!");
 
             // Действия
             var result = host.GetParent(hosts);
@@ -49,6 +51,6 @@ namespace Forbidden_Tests
 
 
         private string[] GetHosts()
-            => new[] { "unlock.microvirus.md", "microvirus.md", "visitwar.com", "visitwar.de", "fruonline.co.uk", "australia.open.com", "credit.card.us", "card.us" };
+            => new[] { "unlock.unlock.microvirus.ru", "unlock.microvirus.ru", "unlock1.microvirus.md","unlock.microvirus.md", "microvirus.md", "visitwar.com", "visitwar.de", "fruonline.co.uk", "australia.open.com", "credit.card.us", "card.us" };
     }
 }

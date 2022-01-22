@@ -25,8 +25,9 @@ namespace Forbidden_Hosts
         {
             var table = new DataTable();
             var tableData = source
-                 .SelectMany(x => x.Items, (x, y) => 
-                 new InnerHostStructure() { Host = y, UniqueCode = x.UniqueCode });
+                // .SelectMany(x => x.Items, (x, y) => 
+                .Select(x => 
+                 new InnerHostStructure() { Host = x.Host, UniqueCode = x.UniqueCode });
 
             var columns = typeof(InnerHostStructure)
                     .GetProperties()
@@ -51,28 +52,27 @@ namespace Forbidden_Hosts
             if (string.IsNullOrEmpty(source.Host))
                 throw new ArgumentNullException("Некорректный аругумент!", nameof(source.Host));
 
-            // Формируем две таблицы. 
-            // Первая таблица со всеми вариантами 
-            // Вторая таблица на основе текущего элемента
+            // Формируем таблицу со всеми вариантами
             var sourceTable = items.Where(x => x.UniqueCode != source.UniqueCode).ToDataTable();
-            var destTable = ((new[] { source }).AsEnumerable()).ToDataTable();
 
-            // Теперь объединяю таблицы по хосту и определяю все связи для построения связанности.
-            var rows = (from s in sourceTable.AsEnumerable()
-                              join p in destTable.AsEnumerable() on s["Host"] equals p["Host"]
-                              group s by s["UniqueCode"] into sourceGroup
-                              select new
-                              {
-                                  parentCode = Convert.ToInt32( sourceGroup.Key),
-                                  Quantity = sourceGroup.Count()
-                              })
-                              // Берем только более короткие хостя.
-                              .Where(x => x.Quantity < source.Items.Count())
-                              // Сортируем.
-                              .OrderBy(x => x.Quantity);
+            // Формируем динамический отбор по хосту
+            sourceTable.DefaultView.RowFilter = " Host like " + string.Join(" OR Host like ", source.FindStataments.ToArray());
+
+            // Получаем результат
+            var table = sourceTable.DefaultView.ToTable();
+            var result = (from s in table.AsEnumerable()
+                         select new
+                         {
+                             parentCode = Convert.ToInt32(s["UniqueCode"]),
+                             Length = s["Host"].ToString().Length
+                         })
+                         // Берем только более короткие хосты.
+                         .Where(x => x.Length < source.Host.Length)
+                         // Сортируем.
+                         .OrderBy(x => x.Length);
 
             // Получаем самый первый элемент - это и есть самый короткий хост.
-            return items.FirstOrDefault(x => x.UniqueCode == (rows.FirstOrDefault()?.parentCode ?? -1));
+            return items.FirstOrDefault(x => x.UniqueCode == (result.FirstOrDefault()?.parentCode ?? -1));
         }
     }
 }

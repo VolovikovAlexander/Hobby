@@ -9,6 +9,7 @@ namespace Forbidden_Hosts
     public class HostItem
     {
         private string _host = "";
+        private IEnumerable<string> _findStataments = Enumerable.Empty<string>();
 
         /// <summary>
         /// Уникальный код хоста
@@ -18,30 +19,19 @@ namespace Forbidden_Hosts
         /// <summary>
         /// Хост
         /// </summary>
-        public string Host { get => _host; set
+        public string Host { 
+            get  => _host; 
+            set
             {
                 _host = value;
-                if (!string.IsNullOrEmpty(_host))
-                {
-                    var items = _host.Split('.').AsEnumerable();
-                    // Сортируем в обратном порядке
-                    Items = items
-                            .Select((x, index) => new { host = x, position = index })
-                            .OrderByDescending(x => x.position)
-                            .Select(x => x.host)
-                            .AsEnumerable();
-                }
+                _findStataments = value.BuildFindStataments();
             }
         }
 
+      
         /// <summary>
-        /// Состав хоста
+        /// Получить список хостов для поиска данных.
         /// </summary>
-        public IEnumerable<string> Items { get; set; }
-
-        /// <summary>
-        /// Ссылка на предыдущий хост
-        /// </summary>
-        public HostItem Parent { get; set; }
+        public IEnumerable<string> FindStataments { get => _findStataments; }
     }
 }
