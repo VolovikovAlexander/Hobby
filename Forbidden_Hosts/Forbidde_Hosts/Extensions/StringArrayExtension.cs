@@ -22,10 +22,15 @@ namespace Forbidden_Hosts
         /// <param name="source"> Массив строк. </param>
         /// <returns></returns>
         public static IEnumerable<HostItem> ToHosts(this string[] source)
-            => source
-                // TODO: Позже, переделать на другой тип уникального номера. На Hash!
-                //.AsParallel()
-                .Select(x => x.ToHost());
+            => source.Select(x => x.ToHost());
+
+        /// <summary>
+        /// Расширение для формирования списка структур <see cref="HostItem"/> из коллекции.
+        /// </summary>
+        /// <param name="souurce"> Коллекция </param>
+        /// <returns></returns>
+        public static IEnumerable<HostItem> ToHosts(this IEnumerable<string> souurce)
+            => souurce.Select(x => x.ToHost());
 
         /// <summary>
         /// Расширение для формирования списка хостов для поиска в общей таблице

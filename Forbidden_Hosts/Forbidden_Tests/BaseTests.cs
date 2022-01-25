@@ -46,10 +46,15 @@ namespace Forbidden_Tests
             var result = host.GetParent(hosts);
 
             // Проверки
+            Assert.IsNotNull(result);
             Assert.AreEqual(parentHost, result.Host);
         }
 
 
+        /// <summary>
+        /// Список всех хостов (обычные и базовые в перемешку).
+        /// </summary>
+        /// <returns></returns>
         private string[] GetHosts()
             => new[] { "unlock.unlock.microvirus.ru", "unlock.microvirus.ru", "unlock1.microvirus.md","unlock.microvirus.md", "microvirus.md", "visitwar.com", "visitwar.de", "fruonline.co.uk", "australia.open.com", "credit.card.us", "card.us" };
     }

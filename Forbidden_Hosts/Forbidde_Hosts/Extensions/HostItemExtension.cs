@@ -72,6 +72,9 @@ namespace Forbidden_Hosts
                          .OrderBy(x => x.Length);
 
             // Получаем самый первый элемент - это и есть самый короткий хост.
+            if (!items.Any(x => x.UniqueCode == (result.FirstOrDefault()?.parentCode ?? -1)))
+                throw new InvalidOperationException($"Для указанного хоста {source.Host} нет подходящих вариантов в списке! Список {string.Join(",", items.Select(x => x.Host).ToArray())}");
+
             return items.FirstOrDefault(x => x.UniqueCode == (result.FirstOrDefault()?.parentCode ?? -1));
         }
     }
