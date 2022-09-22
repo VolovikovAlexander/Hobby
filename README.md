@@ -38,4 +38,9 @@
 Вдохновлен статьей: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/dataview-performance
 Технология: C#, Net 5, Linq, ADO.net, Fluent, NUnit
 
+- **Creatio_Docs**: Прикольное задание. Не  имея опыта работы с **CRM Terrafost Creatio** ответить на поставленные вопросы опираясь на свой опыт, Google и документацию.
+Что из этого у меня получилось, Вы можете почитать, открыв данный каталог. Внутри будет Md файл с вопросами и ответами.
+
+
+
 
