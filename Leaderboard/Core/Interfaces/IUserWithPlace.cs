@@ -8,5 +8,5 @@ public interface IUserWithPlace: IUser
     /// <summary>
     /// Место в рейтинги по баллам
     /// </summary>
-    public int Place { get;  set; }
+    public LeaderboardPlace Place { get;  set; }
 }

@@ -5,5 +5,5 @@ namespace Leaderboard.Core.Models;
 /// </summary>
 public class UserWithPlace: User, IUserWithPlace
 {
-    public int Place { get; set; }
+    public LeaderboardPlace Place { get; set; }
 }
