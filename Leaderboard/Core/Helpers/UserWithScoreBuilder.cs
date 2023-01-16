@@ -25,6 +25,25 @@ public static class UserWithScoreBuilder
             .Select(x => new UserWithScore()
             {
                 UserId = _rnd.NextInt64(9999), Score = _rnd.Next(9999)
-            });
+            }).ToList();
+    }
+
+    /// <summary>
+    /// Сформировать необходимое количество пользователей с конкретными вариантами
+    /// </summary>
+    /// <param name="size"> Количество пользователей </param>
+    /// <param name="settings"> Варианты </param>
+    /// <returns></returns>
+    public static IEnumerable<IUserWithScore> Create(int size, ILeaderboardMinScores settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+        if (size < 4)
+            throw new ArgumentException("Некорректно указано колличество пользователей! Должно быть больше 3-ех");
+
+        return  Enumerable.Range(0, size)
+            .Select(x => new UserWithScore()
+            {
+                UserId = _rnd.NextInt64(9999), Score = _rnd.Next(1, settings.ThirdPlaceMinScore)
+            }).ToList();
     }
 }

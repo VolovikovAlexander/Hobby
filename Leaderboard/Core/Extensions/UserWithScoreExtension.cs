@@ -33,7 +33,7 @@ public static class UserWithScoreExtension
     
         // Место, если значение меньше    
         return settings
-            .OrderByDescending(x => x.Key)
+            .OrderBy(x => x.Key)
             .First(x => x.Value >= value)
             .Key;
     } 
@@ -53,11 +53,33 @@ public static class UserWithScoreExtension
             throw new ArgumentException("Некорректно переданы параметры!", nameof(source));
 
         var ranks = settings.GetRanks();
-        var result = source.Select(x => new UserWithPlace()
-        {
-            UserId = x.UserId,
-            Place = BuildRank(ranks, x.Score)
-        });
+        
+        // Получаем список с рейтингом для всех записей
+        var items
+            = source.Select(x => new UserWithPlace()
+            {
+                UserId = x.UserId,
+                Place = BuildRank(ranks, x.Score)
+            }).Where(x => x.Place != LeaderboardPlace.None)
+                .ToList();
+
+        var result = items.GroupBy(x => x.Place)
+            .Select(x => new
+            {
+                // Место в рейтинге
+                Place = x.Key,
+                // Пользователь (тот, у кого нужный рейтинг и максимальное количество баллов)
+                UserId = (from s in items
+                          from p in source
+                          where s.UserId.Equals(p.UserId) && s.Place.Equals(x.Key)
+                          orderby p.Score 
+                          select s.UserId)
+                    .FirstOrDefault()
+            })
+            .Select(x => new UserWithPlace()
+            {
+                UserId = x.UserId, Place = x.Place
+            });
 
         return result;
     }

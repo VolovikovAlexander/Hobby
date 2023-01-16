@@ -25,5 +25,5 @@ public static class LeaderboardMinScoresBuilder
 
         return new LeaderboardMinScores()
             { FirstPlaceMinScore = first, SecondPlaceMinScore = second, ThirdPlaceMinScore = third };
-    } 
+    }
 }
